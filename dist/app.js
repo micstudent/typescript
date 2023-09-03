@@ -10,26 +10,26 @@ function validate(validatableInput) {
     if (validatableInput.required) {
         isValid = validatableInput.value.toString().trim().length !== 0;
     }
-    if (validatableInput.minLength !== null &&
-        typeof validatableInput.value === 'string') {
+    if (validatableInput.minLength != null &&
+        typeof validatableInput.value == 'string') {
         isValid = isValid && validatableInput.value.length > validatableInput.minLength;
     }
-    if (validatableInput.maxLength !== null &&
-        typeof validatableInput.value === 'string') {
+    if (validatableInput.maxLength != null &&
+        typeof validatableInput.value == 'string') {
         isValid = isValid && validatableInput.value.length < validatableInput.maxLength;
     }
-    if (validatableInput.min !== null &&
-        typeof validatableInput.value === 'number') {
+    if (validatableInput.min != null &&
+        typeof validatableInput.value == 'number') {
         isValid = isValid && validatableInput.value > validatableInput.min;
     }
-    if (validatableInput.max !== null &&
-        typeof validatableInput.value === 'number') {
+    if (validatableInput.max != null &&
+        typeof validatableInput.value == 'number') {
         isValid = isValid && validatableInput.value < validatableInput.max;
     }
     return isValid;
 }
 //autobind decorator
-function autobind(_, _2, descriptor) {
+function autobind(target, methodName, descriptor) {
     const originalMethod = descriptor.value;
     const adjDescriptor = {
         configurable: true,
@@ -75,7 +75,18 @@ class ProjectInput {
     }
     submitHandler(event) {
         event.preventDefault();
-        console.log(this.titleInputElement.value);
+        const userInput = this.gatherUserInput();
+        console.log(userInput);
+        if (Array.isArray(userInput)) {
+            const [title, desc, people] = userInput;
+            this.clearInputs();
+            console.log(title, desc, people);
+        }
+    }
+    clearInputs() {
+        this.titleInputElement.value = "";
+        this.descriptionInputElement.value = "";
+        this.peopleInputElement.value = "";
     }
     configure() {
         this.element.addEventListener('submit', this.submitHandler);
@@ -99,10 +110,12 @@ class ProjectInput {
             min: 1,
             max: 5
         };
+        console.log(titleValidatable, descriptionValidatable, peopleValidatable);
         if (!validate(titleValidatable) ||
             !validate(descriptionValidatable) ||
             !validate(peopleValidatable)) {
             alert("Invalid Input!");
+            return;
         }
         else {
             return [enteredTitle, enteredDescription, +enteredPeople];
